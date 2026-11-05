@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# 依赖与打包产物（install 由 DSH 自己执行）
+node_modules/
+*.tgz
+npm-debug.log*
+
+# 本地截图草稿（README 只用 preview.png）
+preview-credits.png

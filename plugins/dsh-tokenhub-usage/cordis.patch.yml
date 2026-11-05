@@ -1,0 +1,7 @@
+# The dsh-tokenhub-usage bundle patch: the TokenHub usage dashboard.
+# Mounts the host service (tokenhubUsage remote service) and its browser half.
+# Rows must be inserted via an `insert:` list: a bare id-targeted entry without
+# a matching row is dropped with "entry not found".
+- insert:
+    - id: tokenhub-usage
+      name: "dsh-tokenhub-usage"

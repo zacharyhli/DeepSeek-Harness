@@ -1,0 +1,32 @@
+{
+  "name": "dsh-tokenhub-usage",
+  "description": "TokenHub 用量可视化面板：积分余额、模型用量排行、积分趋势与最近调用",
+  "version": "0.2.1",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json",
+    "./client": "./lib/client.js"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "license": "MIT"
+}
