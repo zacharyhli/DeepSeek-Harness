@@ -10,34 +10,27 @@ DSH（DeepSeek Harness）的插件合集。`plugins/` 下每个子目录都是�
 
 ## 安装
 
-> 本仓库是**私有**的，匿名 `git clone` 会被拒（404）。目标机器必须先具备只读权限，二选一：
->
-> 1. 把目标机器的 SSH 公钥加到本仓库 **Settings → Deploy keys**（只勾读权限）
-> 2. 或者目标机器本来就装有该 GitHub 账号的 SSH key
->
-> 然后用 **SSH 形式**的安装地址：
+仓库是**公开**的，目标机器不需要 GitHub 账号或 token。在 DSH「设置 → 插件 → 安装」里选 **Git 仓库**，粘贴：
 
 ```
-git+ssh://git@github.com/zacharyhli/DeepSeek-Harness.git#path:/plugins/dsh-tokenhub-usage
+https://github.com/zacharyhli/DeepSeek-Harness#path:/plugins/dsh-tokenhub-usage
 ```
 
-在 DSH「设置 → 插件 → 安装」里选 **Git 仓库**粘贴，装完按提示「立即启用」，再重启 DSH，侧边栏就会出现入口。
+装完按提示「立即启用」，再重启 DSH，侧边栏就会出现入口。
 
 > **`#path:` 不能省。** 仓库根目录不是 npm 包，安装器需要这个片段才知道包在哪个子目录。
 >
-> 三种写法实测结果（2026-11，pnpm 11.28.5）：
+> 实测（2026-11，pnpm 11.28.5，无任何凭据的环境）：
 >
 > | 写法 | 结果 |
 > | --- | --- |
-> | `git+ssh://git@github.com/…/DeepSeek-Harness.git#path:/plugins/…` | ✅ 私有库可用 |
-> | `git@github.com:zacharyhli/DeepSeek-Harness.git#path:/plugins/…`（scp 写法） | ❌ pnpm 不认 |
-> | `https://github.com/…` + PAT/credential helper | ❌ 安装器预检会清空 credential helper，过不了连通性检查 |
-> | `https://github.com/…`（匿名 HTTPS） | ❌ 私有库返回 404 |
+> | `https://github.com/…/DeepSeek-Harness#path:/plugins/…` | ✅ 匿名可装 |
+> | `…/tree/main/plugins/dsh-tokenhub-usage`（浏览器地址） | ❌ 安装器拒绝：只认仓库地址 + `#path:` |
+> | 不带 `#path:` 的仓库根地址 | ❌ 装出没有 `dsh` 声明的空包 |
 >
-> 浏览器地址栏里的 `…/tree/main/plugins/dsh-tokenhub-usage` 只能浏览代码，粘进安装框会被拒绝。
->
-> 如果你更希望"一条链接匿名安装"，把仓库切成 Public 即可，届时用
-> `https://github.com/zacharyhli/DeepSeek-Harness#path:/plugins/dsh-tokenhub-usage`。
+> 如果以后仓库转回私有，改用 SSH 形式
+> `git+ssh://git@github.com/zacharyhli/DeepSeek-Harness.git#path:/plugins/dsh-tokenhub-usage`，
+> 并先给目标机器加只读 Deploy key（`git@github.com:…` 的 scp 写法 pnpm 不认）。
 
 ## 更新
 
@@ -47,7 +40,7 @@ git+ssh://git@github.com/zacharyhli/DeepSeek-Harness.git#path:/plugins/dsh-token
 
 ```bash
 cd ~/.dsh/profiles/<profile>
-pnpm add "git+ssh://git@github.com/zacharyhli/DeepSeek-Harness.git#path:/plugins/dsh-tokenhub-usage"
+pnpm add "https://github.com/zacharyhli/DeepSeek-Harness#path:/plugins/dsh-tokenhub-usage"
 ```
 
 再把 `dsh-tokenhub-usage` 加进该 profile `package.json` 的 `dsh.profile.bundles` 数组，重启 DSH。
