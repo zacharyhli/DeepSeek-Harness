@@ -34,13 +34,18 @@ DSH 客户端插件：在 Web GUI 侧边栏新增 **TokenHub 用量** 面板，�
 
 ## 从 GitHub 安装（一条链接）
 
-目标机器装好 DSH 后，在「设置 → 插件 → 安装」里把下面这条链接粘进输入框，选 **Git 仓库**：
+> 仓库是**私有**的，目标机器要先有只读权限：把它的 SSH 公钥加成本仓库的 **Deploy key**（只读），
+> 或者该机器已有该账号的 SSH key。匿名 HTTPS 会 404。
+
+目标机器装好 DSH 后，在「设置 → 插件 → 安装」里把下面这条地址粘进输入框，选 **Git 仓库**：
 
 ```
-https://github.com/zacharyhli/DeepSeek-Harness#path:/plugins/dsh-tokenhub-usage
+git+ssh://git@github.com/zacharyhli/DeepSeek-Harness.git#path:/plugins/dsh-tokenhub-usage
 ```
 
 > `#path:` 片段不能省：本插件放在 `DeepSeek-Harness` 仓库的 `plugins/` 子目录里，仓库根不是 npm 包。
+> 必须用 `git+ssh://` 而不是 `git@github.com:...`（pnpm 不认后者），也不能用 HTTPS + PAT
+> （安装器的连通性预检会清空 credential helper）。
 
 然后按提示「立即启用」，重启 DSH 即可。装之前可以先在目标机器上确认 TokenHub CLI 就绪：
 
@@ -51,8 +56,8 @@ th auth login
 
 几点说明：
 
-- 仓库是**公开**的，安装时匿名 `git clone` 即可，目标机器不需要 GitHub 账号或 token。
-- 浏览器里的 `https://github.com/zacharyhli/DeepSeek-Harness/tree/main/plugins/dsh-tokenhub-usage` 只能浏览代码，粘进安装框会被拒（安装器只认仓库地址 + `#path:` 片段）。
+- 仓库是**私有**的，目标机器必须有只读凭据（Deploy key 或账号 SSH key）。
+- 浏览器里的 `…/tree/main/plugins/dsh-tokenhub-usage` 只能浏览代码，粘进安装框会被拒（安装器只认仓库地址 + `#path:` 片段）。
 - DSH 安装器会用内置 pnpm 执行 `pnpm add <链接>`，包内容由本仓库 `package.json` 的 `files` 白名单决定（只有 `lib/`、`cordis.patch.yml`、README/LICENSE），**不需要构建步骤**——`lib/` 就是产物，直接跑。
 - 组合包声明来自 `package.json` 的 `dsh.bundle.patch`，安装器会自动把它加进 profile 的 `dsh.profile.bundles`，**不需要手工编辑 `cordis.patch.yml`**。
 - 升级：重新执行一次同样的安装（或插件页里更新），然后重启 DSH。
@@ -62,7 +67,7 @@ th auth login
 
 | 方式 | 做法 | 适合 |
 | --- | --- | --- |
-| **Git 仓库**（推荐） | 见上，粘带 `#path:` 的仓库地址 | 其他机器一键装、可升级 |
+| **Git 仓库**（推荐） | 见上，粘带 `#path:` 的 SSH 地址 | 其他机器装、可升级 |
 | **压缩包** | 本机 `npm pack` 得到 `dsh-tokenhub-usage-0.2.1.tgz` → 拷到目标机器 → 安装时选 **压缩包** | 内网、无外网 |
 | **本地目录** | 把本目录整个拷过去（不用带 `node_modules`）→ 安装时选 **本地目录** 指向它 | 需要边改边用 |
 | **npm 包名** | 发布到 npm 或内网源后，在安装框直接填 `dsh-tokenhub-usage`；私有源用「安装源」切换 | 多人复用、可升级 |
