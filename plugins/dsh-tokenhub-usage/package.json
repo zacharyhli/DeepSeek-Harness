@@ -1,7 +1,7 @@
 {
   "name": "dsh-tokenhub-usage",
   "description": "TokenHub 用量可视化面板：积分余额、模型用量排行、积分趋势与最近调用",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

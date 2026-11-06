@@ -172,6 +172,37 @@ async function readRecords(limit = 15) {
 	return { rows, listOver: data?.ListOver === true, fetchedAt: new Date().toISOString() };
 }
 
+/**
+ * The CLI's daily credit series only covers completed days, so today's spend is
+ * missing from the trend. Recover it from the plan totals: lifetime used credits
+ * minus the sum of the completed days. A package lasts a month, so the 30-day
+ * window always covers the whole package.
+ */
+function includeTodayCredits(trend, summary) {
+	const primary = summary?.primary;
+	const points = Array.isArray(trend?.points) ? trend.points : [];
+	if (!primary || points.length === 0) return trend;
+	const start = new Date();
+	start.setHours(0, 0, 0, 0);
+	const todayTs = Math.floor(start.getTime() / 1000);
+	if (points.some((point) => Number(point.timestamp) === todayTs)) {
+		return {
+			...trend,
+			points: points.map((point) =>
+				Number(point.timestamp) === todayTs ? { ...point, isToday: true } : point),
+		};
+	}
+	const completed = points.reduce((sum, point) => sum + (Number(point.credits) || 0), 0);
+	const rawToday = Number(primary.usedCredits) - completed;
+	if (!Number.isFinite(rawToday)) return trend;
+	const todayCredits = Math.round(Math.max(rawToday, 0) * 100) / 100;
+	return {
+		...trend,
+		points: [...points, { timestamp: todayTs, credits: todayCredits, isToday: true }],
+		todayCredits,
+	};
+}
+
 /** The whole page payload, cached briefly and single-flighted. */
 function createSnapshotSource(config) {
 	const ttlMs = Number(config?.cacheTtlMs) > 0 ? Number(config.cacheTtlMs) : 30_000;
@@ -204,7 +235,7 @@ function createSnapshotSource(config) {
 				cached("credits", () => readCreditTrend("30day")),
 				cached("records", () => readRecords(15)),
 			]);
-			return { summary, rank, credits, records, fetchedAt: new Date().toISOString() };
+			return { summary, rank, credits: includeTodayCredits(credits, summary), records, fetchedAt: new Date().toISOString() };
 		},
 		clear() {
 			cache.clear();

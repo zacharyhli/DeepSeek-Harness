@@ -52,6 +52,7 @@ window.__ModuleLoader__.load({
 				credits: "积分",
 				empty: "暂无数据",
 				perDay: "每日消耗积分",
+				today: "今天",
 			},
 			en: {
 				panel: "TokenHub Usage",
@@ -85,6 +86,7 @@ window.__ModuleLoader__.load({
 				credits: "Credits",
 				empty: "No data yet",
 				perDay: "Credits per day",
+				today: "Today",
 			},
 		};
 
@@ -296,10 +298,11 @@ window.__ModuleLoader__.load({
 					jsx("div", { style: { ...styles.muted, marginBottom: 8 }, children: t("perDay") }),
 					jsx("div", { style: { display: "flex", alignItems: "flex-end", gap: 4, height: 108 }, children: points.map((p, i) => {
 						const value = Number(p.credits) || 0;
-						return jsxs("div", { style: { flex: 1, height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: 2 }, title: `${dayFull(p.timestamp)} · ${fmtCredits(value)}`, children: [
+						const isToday = p.isToday === true;
+						return jsxs("div", { style: { flex: 1, height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: 2 }, title: `${dayFull(p.timestamp)}${isToday ? ` · ${t("today")}` : ""} · ${fmtCredits(value)}`, children: [
 							jsx("div", { style: { fontSize: 9, lineHeight: "11px", height: 11, opacity: value > 0 ? 0.75 : 0.3, whiteSpace: "nowrap" }, children: barText(value) }),
-							jsx("div", { style: { width: "70%", maxWidth: 26, minHeight: 2, borderRadius: 3, background: "#3b82f6", height: Math.max((value / max) * 72, 2) } }),
-							jsx("div", { style: { fontSize: 9.5, lineHeight: "12px", height: 12, opacity: 0.55, whiteSpace: "nowrap" }, children: labelled.has(i) ? day(p.timestamp) : "" }),
+							jsx("div", { style: { width: "70%", maxWidth: 26, minHeight: 2, borderRadius: 3, background: isToday ? "#f59e0b" : "#3b82f6", height: Math.max((value / max) * 72, 2) } }),
+							jsx("div", { style: { fontSize: 9.5, lineHeight: "12px", height: 12, opacity: isToday ? 0.9 : 0.55, fontWeight: isToday ? 600 : 400, whiteSpace: "nowrap" }, children: isToday ? t("today") : (labelled.has(i) ? day(p.timestamp) : "") }),
 						] }, p.timestamp ?? i);
 					}) }),
 				] }) });
